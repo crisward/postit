@@ -1,14 +1,10 @@
-# Riot Crytal
+# Post-it
 
-Been playing around with crystal. Just wanted to create a starting point.
-This is very oppinionated and may not be to everyones (or anyones) taste.
+Sample app using [riot-crystal](https://github.com/crisward/riot-crystal/) as a starting point.
 
-Stack includes
+It creates multi-client websocket connected post-it
+note canvas which updates in real time.
 
-* [Crystal - server language](https://crystal-lang.org/)
-* [Kemal - server framework](http://kemalcr.com/)
-* [Riot - client framework](http://riotjs.com/)
-* [Coffeescript](http://coffeescript.org/) / [Pug(Jade)](http://jade-lang.com/) / [Stylus](http://stylus-lang.com/) for shorthand code on the client
 
 ## Installation
 
@@ -48,16 +44,3 @@ npm run build && crystal build --release src/app.cr
 ```
 
 The built server can then be run with `./app`
-
-### App Structure
-
-It mainly follows an app created with `Crystal init app app`
-
-```bash
-client # client side code
-client/tags # put your riot tags here
-client/app.coffee # loads tags here, mounts app
-public # public folder
-spec # crystal tests
-src # crysal source code
-```
