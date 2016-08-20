@@ -10,3 +10,9 @@ dependencies:
   kemal:
     github: sdogruyol/kemal
     branch: master
+  db:
+    github: crystal-lang/crystal-db
+    branch: master
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+    branch: master

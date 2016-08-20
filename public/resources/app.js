@@ -20,24 +20,48 @@ riot.tag2('app', '<board></board>', 'board { position: absolute; top: 0; left: 0
 },{"riot":5}],3:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag2('board', '<button class="btn" onclick="{addnote}">Add Note</button> <note each="{note,idx in notes}" riot-style="top:{note.top}px;left:{note.left}px;z-index:{idx==active?5:1}" idx="{idx}" editing="{note.editing}" text="{note.text}" chosen="{parent.noteSelected}" changed="{parent.noteChange}"></note>', 'board { border: 1px solid #ccc; background: #ccc; } .btn { border: 1px solid #ccc; background: rgba(255,255,255,0.8); border-radius: 4px; padding: 5px 8px; font-size: 14px; } .btn:active, .btn:focus { background: #fff; outline: 0px; }', '', function(opts) {
-this.notes = [
-  {
-    top: 100,
-    left: 100,
-    text: "New Note",
-    editing: false
-  }
-];
+riot.tag2('board', '<button class="btn" onclick="{addnote}">Add Note</button> <note each="{note,idx in notes}" no-reorder riot-style="top:{note.top}px;left:{note.left}px;z-index:{idx==active?5:1}" idx="{idx}" editing="{note.editing}" text="{note.text}" chosen="{parent.noteSelected}" changed="{parent.noteChange}"></note>', 'board { border: 1px solid #ccc; background: #ccc; } .btn { border: 1px solid #ccc; background: rgba(255,255,255,0.8); border-radius: 4px; padding: 5px 8px; font-size: 14px; } .btn:active, .btn:focus { background: #fff; outline: 0px; }', '', function(opts) {
+this.notes = [];
+
+this.on('mount', function() {
+  this.socket = new WebSocket('ws://127.0.0.1:3000');
+  this.socket.onopen = (function(_this) {
+    return function() {
+      return _this.getNotes();
+    };
+  })(this);
+  return this.socket.onmessage = (function(_this) {
+    return function(res) {
+      var message;
+      message = JSON.parse(res.data);
+      switch (message.type) {
+        case "notes:all":
+          return _this.updateAll(message.notes);
+        default:
+          return console.log(message.type, "unhandled");
+      }
+    };
+  })(this);
+});
 
 this.addnote = (function(_this) {
   return function() {
+    var data;
     _this.notes.push({
       top: 100,
       left: 100,
       text: "New Note",
       editing: false
     });
+    data = {
+      type: "notes:add",
+      note: {
+        top: 100,
+        left: 100,
+        text: "New Note"
+      }
+    };
+    _this.socket.send(JSON.stringify(data));
     return _this.update();
   };
 })(this);
@@ -52,8 +76,32 @@ this.noteSelected = (function(_this) {
 
 this.noteChange = (function(_this) {
   return function(idx, note) {
+    note.id = _this.notes[idx].id;
     _this.notes[idx] = note;
-    console.log(note);
+    if (!note.editing) {
+      _this.socket.send(JSON.stringify({
+        type: "notes:update",
+        note: note
+      }));
+    }
+    return _this.update();
+  };
+})(this);
+
+this.getNotes = (function(_this) {
+  return function() {
+    var data;
+    data = {
+      type: "notes:getAll"
+    };
+    return _this.socket.send(JSON.stringify(data));
+  };
+})(this);
+
+this.updateAll = (function(_this) {
+  return function(notes) {
+    _this.notes = notes;
+    console.log('updateAll', _this.notes);
     return _this.update();
   };
 })(this);
@@ -61,10 +109,15 @@ this.noteChange = (function(_this) {
 },{"riot":5}],4:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag2('note', '<div class="wrap pre" if="{!opts.editing}">{opts.text} <button class="btn editbutton" onclick="{startEdit}">Edit</button> </div> <div if="{opts.editing}"> <textarea name="text" value="{opts.text}"></textarea> <button class="btn editbutton" onclick="{endEdit}">Save</button> </div>', 'note { display: block; color: #333; position: absolute; width: 200px; min-height: 200px; margin: 0 auto; padding: 10px; font-size: 21px; -webkit-box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); background: #eae672; } note .wrap { padding: 10px 10px 40px 10px; } note .pre { white-space: pre; } .editbutton { position: absolute; bottom: 10px; right: 10px; } note textarea { width: 100%; background: transparent; border: 0px; padding: 10px; outline: 1px dotted #444; resize: none; min-height: 140px; font-size: 21px; }', 'onmousedown="{dragstart}" ondblclick="{startEdit}"', function(opts) {
+riot.tag2('note', '<div class="wrap pre" if="{!opts.editing}">{opts.text} <button class="btn editbutton" onclick="{startEdit}">Edit</button> </div> <div if="{opts.editing}"> <textarea name="text" value="{opts.text}"></textarea> <button class="btn editbutton" onclick="{endEdit}">Save</button> </div>', 'note { display: block; color: #333; position: absolute; width: 200px; min-height: 200px; margin: 0 auto; padding: 10px; font-size: 21px; -webkit-box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); background: #eae672; } note .pre { white-space: pre; } note.animate { -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; -o-transition: all 0.5s ease; -ms-transition: all 0.5s ease; transition: all 0.5s ease; } .editbutton { position: absolute; bottom: 10px; right: 10px; } note textarea { width: 100%; background: transparent; border: 0px; padding: 10px; outline: 1px dotted #444; resize: none; min-height: 140px; font-size: 21px; }', 'onmousedown="{dragstart}" ondblclick="{startEdit}"', function(opts) {
+this.on('mount', function() {
+  return this.root.className += " animate";
+});
+
 this.dragstart = (function(_this) {
   return function(e) {
     _this.moved = false;
+    _this.root.className = _this.root.className.replace(/ ?animate/, '');
     if (opts.chosen) {
       opts.chosen(opts.idx);
     }
@@ -106,6 +159,7 @@ this.updateOffset = (function(_this) {
 
 this.dragend = (function(_this) {
   return function(e) {
+    _this.root.className += " animate";
     document.removeEventListener('mousemove', _this.dragging);
     document.removeEventListener('mouseup', _this.dragend);
     if (_this.moved) {

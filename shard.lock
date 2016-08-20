@@ -1,5 +1,9 @@
 version: 1.0
 shards:
+  db:
+    github: crystal-lang/crystal-db
+    commit: b5112d9a48d092ef6b46c302c865b0b24369c766
+
   kemal:
     github: sdogruyol/kemal
     commit: 6280af2e405258cc353e7d6039f3066817398a45
@@ -11,4 +15,8 @@ shards:
   radix:
     github: luislavena/radix
     version: 0.3.0
+
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+    commit: c3fce779fe0d1ae36fba217ead67a306e77834c1
 

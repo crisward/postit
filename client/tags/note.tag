@@ -17,13 +17,13 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
       font-size: 21px;
       box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3);
       background: #eae672;
-    
-    note .wrap
-      padding 10px 10px 40px 10px
-    
+            
     note .pre
       white-space pre
     
+    note.animate
+      transition all 0.5s ease
+
     .editbutton
       position absolute
       bottom 10px
@@ -40,8 +40,12 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
 
   script(type="coffee").
 
+    @on 'mount',->
+      @root.className += " animate"
+
     @dragstart = (e)=>
       @moved = false
+      @root.className = @root.className.replace(/ ?animate/,'')
       opts.chosen(opts.idx) if opts.chosen
       @startNote = @root.getBoundingClientRect()
       @startMouse = {x:e.clientX,y:e.clientY}
@@ -57,12 +61,13 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
       @root.style.left = @offset.x+"px"
       @root.style.top = @offset.y+"px"
 
-    @updateOffset =(pos)=>
+    @updateOffset = (pos)=>
       @offset = 
         x:pos.x - @startMouse.x + @startNote.left
         y:pos.y - @startMouse.y + @startNote.top
 
     @dragend = (e)=>
+      @root.className += " animate"
       document.removeEventListener('mousemove',@dragging)
       document.removeEventListener('mouseup',@dragend)
       if @moved
