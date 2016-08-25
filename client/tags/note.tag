@@ -1,12 +1,12 @@
 note(onmousedown="{dragstart}",ontouchstart="{dragstart}",ondblclick="{startEdit}")
   div.wrap.pre(if="{!opts.editing}") {opts.text}
     .editbuttons
-      a.btn(onclick="{startEdit}") Edit
-      a.btn(onclick="{remove}") &times;
+      a.btn(onclick="{startEdit}",ontouchstart="{startEdit}") Edit
+      a.btn(onclick="{remove}",ontouchstart="{remove}") &times;
   div(if="{opts.editing}")
     textarea(name="text",value="{opts.text}")
     .editbuttons
-      a.btn(onclick="{endEdit}") Save
+      a.btn(onclick="{endEdit}",ontouchstart="{endEdit}") Save
     
 
   style(type="stylus").
