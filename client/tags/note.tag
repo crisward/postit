@@ -1,9 +1,13 @@
 note(onmousedown="{dragstart}",ondblclick="{startEdit}")
   div.wrap.pre(if="{!opts.editing}") {opts.text}
-    button.btn.editbutton(onclick="{startEdit}") Edit
+    .editbuttons
+      a.btn(onclick="{startEdit}") Edit
+      a.btn(onclick="{remove}") &times;
   div(if="{opts.editing}")
     textarea(name="text",value="{opts.text}")
-    button.btn.editbutton(onclick="{endEdit}") Save
+    .editbuttons
+      a.btn(onclick="{endEdit}") Save
+    
 
   style(type="stylus").
     note
@@ -24,10 +28,11 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
     note.animate
       transition all 0.5s ease
 
-    .editbutton
+    .editbuttons
       position absolute
       bottom 10px
       right 10px
+      
     note textarea
      width 100%
      background transparent
@@ -89,4 +94,7 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
         top:@offset.y
         left:@offset.x
         text:@text.value
-        editing:false     
+        editing:false   
+
+    @remove = =>
+      opts.remove(opts.idx)

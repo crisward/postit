@@ -17,6 +17,11 @@ module App
     render "src/views/index.ecr"
   end
 
+  get "/api/notes" do |ctx|
+    ctx.response.content_type = "application/json"
+    notes.all.to_json
+  end
+
   ws "/" do |socket|
     noteRoom.add(socket)
     socket.on_message do |json|
