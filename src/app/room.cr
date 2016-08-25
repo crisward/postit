@@ -18,7 +18,7 @@ module App
 
     def send_all(json : String)
       @sockets.each do |socket| 
-        socket.send json
+        socket.send json if socket
       end
     end
 
