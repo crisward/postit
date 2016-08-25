@@ -1,4 +1,4 @@
-note(onmousedown="{dragstart}",ondblclick="{startEdit}")
+note(onmousedown="{dragstart}",ontouchstart="{dragstart}",ondblclick="{startEdit}")
   div.wrap.pre(if="{!opts.editing}") {opts.text}
     .editbuttons
       a.btn(onclick="{startEdit}") Edit
@@ -32,7 +32,7 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
       position absolute
       bottom 10px
       right 10px
-      
+
     note textarea
      width 100%
      background transparent
@@ -49,19 +49,23 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
       @root.className += " animate"
 
     @dragstart = (e)=>
+      console.log e
       @moved = false
       @root.className = @root.className.replace(/ ?animate/,'')
       opts.chosen(opts.idx) if opts.chosen
       @startNote = @root.getBoundingClientRect()
-      @startMouse = {x:e.clientX,y:e.clientY}
+      @startMouse = {x:e.pageX,y:e.pageY}
       @updateOffset(@startMouse)
       return true if opts.editing
       document.addEventListener('mousemove',@dragging)
       document.addEventListener('mouseup',@dragend)
+      document.addEventListener('touchmove',@dragging)
+      document.addEventListener('touchend',@dragend)
       
     @dragging = (e)=>
+      console.log 'dragging',e
       @moved = true
-      @pos = {x:e.clientX,y:e.clientY}
+      @pos = {x:e.pageX,y:e.pageY}
       @updateOffset(@pos)
       @root.style.left = @offset.x+"px"
       @root.style.top = @offset.y+"px"
@@ -75,6 +79,8 @@ note(onmousedown="{dragstart}",ondblclick="{startEdit}")
       @root.className += " animate"
       document.removeEventListener('mousemove',@dragging)
       document.removeEventListener('mouseup',@dragend)
+      document.removeEventListener('touchmove',@dragging)
+      document.removeEventListener('touchend',@dragend)
       if @moved
         opts.changed opts.idx,
           top:@offset.y

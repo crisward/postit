@@ -37,7 +37,7 @@ board
 
     @connect = =>
       if !@connected
-        @socket = new WebSocket('ws://127.0.0.1:3000')
+        @socket = new WebSocket('ws://'+window.location.host)
         @socket.onopen = =>
           @connected = true
           @reconnecting = false

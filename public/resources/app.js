@@ -30,7 +30,7 @@ this.on('mount', function() {
 this.connect = (function(_this) {
   return function() {
     if (!_this.connected) {
-      _this.socket = new WebSocket('ws://127.0.0.1:3000');
+      _this.socket = new WebSocket('ws://' + window.location.host);
       _this.socket.onopen = function() {
         _this.connected = true;
         _this.reconnecting = false;
@@ -160,13 +160,14 @@ this.updateAll = (function(_this) {
 },{"riot":5}],4:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag2('note', '<div class="wrap pre" if="{!opts.editing}">{opts.text} <div class="editbuttons"><a class="btn" onclick="{startEdit}">Edit</a><a class="btn" onclick="{remove}">&times;</a></div> </div> <div if="{opts.editing}"> <textarea name="text" value="{opts.text}"></textarea> <div class="editbuttons"><a class="btn" onclick="{endEdit}">Save</a></div> </div>', 'note { display: block; color: #333; position: absolute; width: 200px; min-height: 200px; margin: 0 auto; padding: 10px; font-size: 21px; -webkit-box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); background: #eae672; } note .pre { white-space: pre; } note.animate { -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; -o-transition: all 0.5s ease; -ms-transition: all 0.5s ease; transition: all 0.5s ease; } .editbuttons { position: absolute; bottom: 10px; right: 10px; } note textarea { width: 100%; background: transparent; border: 0px; padding: 10px; outline: 1px dotted #444; resize: none; min-height: 140px; font-size: 21px; }', 'onmousedown="{dragstart}" ondblclick="{startEdit}"', function(opts) {
+riot.tag2('note', '<div class="wrap pre" if="{!opts.editing}">{opts.text} <div class="editbuttons"><a class="btn" onclick="{startEdit}">Edit</a><a class="btn" onclick="{remove}">&times;</a></div> </div> <div if="{opts.editing}"> <textarea name="text" value="{opts.text}"></textarea> <div class="editbuttons"><a class="btn" onclick="{endEdit}">Save</a></div> </div>', 'note { display: block; color: #333; position: absolute; width: 200px; min-height: 200px; margin: 0 auto; padding: 10px; font-size: 21px; -webkit-box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3); background: #eae672; } note .pre { white-space: pre; } note.animate { -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; -o-transition: all 0.5s ease; -ms-transition: all 0.5s ease; transition: all 0.5s ease; } .editbuttons { position: absolute; bottom: 10px; right: 10px; } note textarea { width: 100%; background: transparent; border: 0px; padding: 10px; outline: 1px dotted #444; resize: none; min-height: 140px; font-size: 21px; }', 'onmousedown="{dragstart}" ontouchstart="{dragstart}" ondblclick="{startEdit}"', function(opts) {
 this.on('mount', function() {
   return this.root.className += " animate";
 });
 
 this.dragstart = (function(_this) {
   return function(e) {
+    console.log(e);
     _this.moved = false;
     _this.root.className = _this.root.className.replace(/ ?animate/, '');
     if (opts.chosen) {
@@ -174,24 +175,27 @@ this.dragstart = (function(_this) {
     }
     _this.startNote = _this.root.getBoundingClientRect();
     _this.startMouse = {
-      x: e.clientX,
-      y: e.clientY
+      x: e.pageX,
+      y: e.pageY
     };
     _this.updateOffset(_this.startMouse);
     if (opts.editing) {
       return true;
     }
     document.addEventListener('mousemove', _this.dragging);
-    return document.addEventListener('mouseup', _this.dragend);
+    document.addEventListener('mouseup', _this.dragend);
+    document.addEventListener('touchmove', _this.dragging);
+    return document.addEventListener('touchend', _this.dragend);
   };
 })(this);
 
 this.dragging = (function(_this) {
   return function(e) {
+    console.log('dragging', e);
     _this.moved = true;
     _this.pos = {
-      x: e.clientX,
-      y: e.clientY
+      x: e.pageX,
+      y: e.pageY
     };
     _this.updateOffset(_this.pos);
     _this.root.style.left = _this.offset.x + "px";
@@ -213,6 +217,8 @@ this.dragend = (function(_this) {
     _this.root.className += " animate";
     document.removeEventListener('mousemove', _this.dragging);
     document.removeEventListener('mouseup', _this.dragend);
+    document.removeEventListener('touchmove', _this.dragging);
+    document.removeEventListener('touchend', _this.dragend);
     if (_this.moved) {
       return opts.changed(opts.idx, {
         top: _this.offset.y,
