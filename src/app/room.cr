@@ -13,6 +13,7 @@ module App
 
     def remove(socket : HTTP::WebSocket)
       @sockets.delete socket
+      p "disconnected",@sockets.size
     end
 
     def send_all(json : String)
