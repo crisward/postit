@@ -2,6 +2,9 @@
 /libs/
 /.crystal/
 /.shards/
+/public/resources
+!/public/resources/.gitkeep
 node_modules
+data.db
 
 
