@@ -3,15 +3,15 @@
 Sample app using [riot-crystal](https://github.com/crisward/riot-crystal/) as a starting point.
 
 It creates multi-client websocket connected post-it
-note canvas which updates in real time.
+note canvas which updates in real time. Uses Sqlite to persist data.
 
 
 ## Installation
 
 ```
-git clone git@github.com:crisward/riot-crystal.git
-cd riot-crystal
-crytals deps
+git clone git@github.com:crisward/postit.git
+cd postit
+crytal deps
 npm install
 ```
 
